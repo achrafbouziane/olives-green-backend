@@ -17,10 +17,15 @@
         <option value="$PROJECT_DIR$/CustomerService/pom.xml" />
         <option value="$PROJECT_DIR$/ContentService/pom.xml" />
         <option value="$PROJECT_DIR$/ScheduleService/pom.xml" />
+        <option value="$PROJECT_DIR$/job-service/pom.xml" />
+        <option value="$PROJECT_DIR$/schedule-service/pom.xml" />
+        <option value="$PROJECT_DIR$/customer-service/pom.xml" />
+        <option value="$PROJECT_DIR$/content-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/JobService/pom.xml" />
         <option value="$PROJECT_DIR$/course-service/pom.xml" />
         <option value="$PROJECT_DIR$/profile-service/pom.xml" />
         <option value="$PROJECT_DIR$/user-service/pom.xml" />
