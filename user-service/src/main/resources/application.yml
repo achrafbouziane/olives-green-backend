@@ -1,0 +1,11 @@
+# In: user-service/src/main/resources/application.yml
+
+spring:
+  application:
+    # This is the most important line.
+    # It's the service's name in Eureka and the name of its config file.
+    name: user-service
+
+  # This tells the app how to find the Config Server
+  config:
+    import: "configserver:http://localhost:8888"
