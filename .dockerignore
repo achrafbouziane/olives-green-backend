@@ -1,0 +1,15 @@
+# Maven build output
+**/target/
+
+# IDE
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# OS/system files
+.DS_Store
+
+# Node (si front plus tard)
+node_modules/
