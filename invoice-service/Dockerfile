@@ -4,19 +4,14 @@ FROM maven:3.9-eclipse-temurin-21 AS build
 ARG SERVICE_NAME
 WORKDIR /app
 
-COPY pom.xml .
+# Copy full project (fastest, most stable)
+COPY . .
 
-COPY "${SERVICE_NAME}/pom.xml" "${SERVICE_NAME}/"
-
+# Build only the needed module
 WORKDIR /app/${SERVICE_NAME}
+RUN mvn -q clean package -DskipTests
 
-RUN mvn dependency:go-offline
-
-COPY "${SERVICE_NAME}/src" "src"
-
-RUN mvn clean install -Dmaven.test.skip=true
-
-# --- Final Image ---
+# ---- Final Image ----
 FROM eclipse-temurin:21-jre-alpine
 ARG SERVICE_NAME
 WORKDIR /app
