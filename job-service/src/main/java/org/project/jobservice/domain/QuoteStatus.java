@@ -1,8 +1,9 @@
 package org.project.jobservice.domain;
 
 public enum QuoteStatus {
-    DRAFT,
-    SENT,
+    REQUESTED,
+    ESTIMATE_SENT,
     APPROVED,
-    REJECTED
+    REJECTED,
+    DEPOSIT_PAID
 }

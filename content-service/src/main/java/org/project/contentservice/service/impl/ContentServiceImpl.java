@@ -1,6 +1,5 @@
 package org.project.contentservice.service.impl;
 
-
 import org.project.contentservice.dto.SavePageRequest;
 import org.project.contentservice.dto.ServicePageDTO;
 import org.project.contentservice.mapper.ContentMapper;
@@ -25,13 +24,13 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public ServicePageDTO getPageBySlug(String slug) {
         ServicePage page = findBySlug(slug);
-        return contentMapper.mapToPageDTO(page);
+        return contentMapper.toDTO(page);
     }
 
     @Override
     public List<ServicePageDTO> getAllPages() {
         return pageRepository.findAll().stream()
-                .map(contentMapper::mapToPageDTO)
+                .map(contentMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -43,16 +42,11 @@ public class ContentServiceImpl implements ContentService {
             throw new IllegalArgumentException("Page slug already exists: " + request.pageSlug());
         }
 
-        ServicePage page = ServicePage.builder()
-                .pageSlug(request.pageSlug())
-                .title(request.title())
-                .subTitle(request.subTitle())
-                .imageUrl(request.imageUrl())
-                .htmlContent(request.htmlContent())
-                .build();
+        // Use Mapper to create Entity
+        ServicePage page = contentMapper.toEntity(request);
 
         ServicePage savedPage = pageRepository.save(page);
-        return contentMapper.mapToPageDTO(savedPage);
+        return contentMapper.toDTO(savedPage);
     }
 
     @Override
@@ -60,19 +54,23 @@ public class ContentServiceImpl implements ContentService {
     public ServicePageDTO updatePage(String slug, SavePageRequest request) {
         ServicePage page = findBySlug(slug);
 
-        // Update the fields
+        // Option A: Use Mapper to update fields (cleanest)
+        // ensure your mapper ignores 'id' and 'pageSlug' if you don't want them changed
+        // contentMapper.updateEntityFromRequest(request, page);
+
+        // Option B: Manual setters (Safest for specific business rules)
         page.setTitle(request.title());
         page.setSubTitle(request.subTitle());
         page.setImageUrl(request.imageUrl());
-        page.setHtmlContent(request.htmlContent());
-        // You might want to allow slug updates, but it can be tricky
-        // page.setPageSlug(request.pageSlug());
+        page.setDescription(request.description());
+        page.setFeatures(request.features());
 
         ServicePage savedPage = pageRepository.save(page);
-        return contentMapper.mapToPageDTO(savedPage);
+        return contentMapper.toDTO(savedPage);
     }
 
-    // --- Private Helper ---
+    // --- Private Helpers ---
+
     private ServicePage findBySlug(String slug) {
         return pageRepository.findByPageSlug(slug)
                 .orElseThrow(() -> new EntityNotFoundException("Page not found with slug: " + slug));

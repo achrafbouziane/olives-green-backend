@@ -1,4 +1,4 @@
-package org.tp.gatewayservice;
+package org.project.gatewayservice;
 
 
 import lombok.extern.slf4j.Slf4j;

@@ -57,5 +57,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         throw new IllegalArgumentException("Invalid token");
     }
 
+    public void changePassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordChangeRequired(false); // FLIP THE FLAG
+        userRepository.save(user);
+    }
+
 
 }

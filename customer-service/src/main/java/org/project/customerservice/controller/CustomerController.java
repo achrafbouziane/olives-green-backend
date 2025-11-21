@@ -47,4 +47,9 @@ public class CustomerController {
     public ResponseEntity<List<PropertyDTO>> getPropertiesForCustomer(@PathVariable UUID id) {
         return ResponseEntity.ok(customerService.getPropertiesForCustomer(id));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<CustomerDTO> getCustomerByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(customerService.getCustomerByEmail(email));
+    }
 }

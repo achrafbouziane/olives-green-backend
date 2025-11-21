@@ -1,11 +1,18 @@
 package org.project.notificationservice.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
+
 
 @Data
 @Entity
 @Table(name = "notification_templates")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class NotificationTemplate {
 
     @Id

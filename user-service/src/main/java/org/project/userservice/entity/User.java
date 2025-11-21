@@ -41,6 +41,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "password_change_required")
+    private boolean passwordChangeRequired;
+
     // --- UserDetails Methods ---
 
     @Override
@@ -80,4 +83,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }

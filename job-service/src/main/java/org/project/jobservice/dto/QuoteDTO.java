@@ -15,6 +15,14 @@ public record QuoteDTO(
         String title,
         QuoteStatus status,
         BigDecimal totalAmount,
+
+        // --- NEW FIELDS FOR ESTIMATE ---
+        BigDecimal depositAmount,
+        String magicLinkToken,
+        // -------------------------------
+        String requestDetails,
+
         Instant createdAt,
-        List<LineItemDTO> lineItems
+        List<LineItemDTO> lineItems,
+        List<String> mockupImageUrls
 ) {}

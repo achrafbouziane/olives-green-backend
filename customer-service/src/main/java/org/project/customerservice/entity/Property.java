@@ -1,22 +1,20 @@
 package org.project.customerservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import java.util.UUID;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "properties")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Property {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
@@ -28,13 +26,13 @@ public class Property {
     private String city;
 
     @Column(nullable = false)
+    private String state; // <--- NEW FIELD
+
+    @Column(nullable = false)
     private String postalCode;
 
-    @Column(columnDefinition = "TEXT")
-    private String notes; // e.g., "Gate code is 1234", "Beware of dog"
+    private String notes;
 
-    // A Property belongs to one Customer.
-    // This is the "owning" side of the relationship.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;

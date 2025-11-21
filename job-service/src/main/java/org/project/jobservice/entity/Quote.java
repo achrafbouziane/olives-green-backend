@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.project.jobservice.domain.QuoteStatus;
+import jakarta.persistence.Column;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -43,6 +44,14 @@ public class Quote {
     @Column(nullable = false)
     private BigDecimal totalAmount;
 
+    private String magicLinkToken; // Unique token for email link
+    private BigDecimal depositAmount; // The 50% required
+    private Instant estimateSentAt;
+
+    @Column(columnDefinition = "TEXT") // Allow long text for coords/address
+    private String requestDetails;
+
+
     private Instant createdAt;
     private Instant sentAt;
     private Instant approvedAt;
@@ -50,4 +59,10 @@ public class Quote {
     // A Quote has many LineItems
     @OneToMany(mappedBy = "quote", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<LineItem> lineItems = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "quote_mockups", joinColumns = @JoinColumn(name = "quote_id"))
+    @Column(name = "image_url")
+    private List<String> mockupImageUrls;
+
 }

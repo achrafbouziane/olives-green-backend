@@ -5,5 +5,6 @@ import lombok.Builder;
 @Builder
 public record AuthenticationResponse(
         String token,
-        UserDTO user
+        UserDTO user,
+        boolean requiresPasswordChange
 ) {}

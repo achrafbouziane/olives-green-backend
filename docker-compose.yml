@@ -79,6 +79,8 @@ services:
       SPRING_CLOUD_CONFIG_FAILFAST: false
       SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+
 
   # 5. User Service
   user-service:
@@ -220,6 +222,7 @@ services:
       NOTIFICATION_DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
       TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
 
   # 11. Content Service
   content-service:

@@ -1,6 +1,8 @@
 package org.project.userservice.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.project.userservice.dto.RegisterRequest;
+import org.project.userservice.dto.UpdateUserRequest;
 import org.project.userservice.dto.UserDTO;
 import org.project.userservice.entity.User;
 import org.project.userservice.mapper.UserMapper;
@@ -9,6 +11,8 @@ import org.project.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +36,34 @@ public class UserServiceImpl implements UserService {
                 .role(request.role())
                 .build();
 
+        user.setPasswordChangeRequired(true);
         var savedUser = userRepository.save(user);
         return userMapper.mapToUserDTO(savedUser);
     }
+    @Override
+    @Transactional
+    public UserDTO updateUser(UUID id, UpdateUserRequest request) {
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setEmail(request.email());
+        user.setRole(request.role());
+
+        return userMapper.mapToUserDTO(userRepository.save(user));
+    }
+
+    @Override
+    public void deleteUser(UUID id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found");
+        }
+        userRepository.deleteById(id);
+    }
+
+
 
 
 }

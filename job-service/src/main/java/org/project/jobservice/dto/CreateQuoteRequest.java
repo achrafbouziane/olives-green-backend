@@ -10,5 +10,7 @@ public record CreateQuoteRequest(
         UUID customerId,
         UUID propertyId,
         String title,
-        List<CreateLineItemRequest> lineItems
+        String requestDetails,
+        List<CreateLineItemRequest> lineItems,
+        List<String> mockupImageUrls
 ) {}
