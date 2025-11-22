@@ -20,12 +20,15 @@ import java.util.stream.Collectors;
 @Service
 public class JwtService {
 
-    // These values will be injected from your user-service.yml file
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
+
+    // NEW: Injection for Refresh Token Expiration
+    @Value("${application.security.jwt.refresh-token.expiration}")
+    private long refreshExpiration;
 
     // --- Public Methods ---
 
@@ -46,17 +49,32 @@ public class JwtService {
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
-        // Add roles to the "authorities" claim
+        // Add roles to the "authorities" claim for Access Tokens
         extraClaims.put("authorities", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 
+        return buildToken(extraClaims, userDetails, jwtExpiration);
+    }
+
+    // NEW: Method to generate Refresh Token
+    public String generateRefreshToken(UserDetails userDetails) {
+        // Refresh tokens usually don't need extra claims like authorities
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
+    }
+
+    // Refactored: Common logic for building any token
+    private String buildToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails,
+            long expiration
+    ) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

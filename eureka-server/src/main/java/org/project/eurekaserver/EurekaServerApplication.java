@@ -1,4 +1,4 @@
-package org.tp.eurekaserver;
+package org.project.eurekaserver;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;

@@ -1,9 +1,11 @@
 package org.project.jobservice.service.impl;
-import org.project.jobservice.dto.AssignEmployeeRequest;
-import org.project.jobservice.dto.JobDTO;
-import org.project.jobservice.dto.UpdateJobStatusRequest;
-import org.project.jobservice.mapper.JobMapper;
+
+import org.project.jobservice.client.CustomerClient;
+import org.project.jobservice.client.ScheduleClient;
+import org.project.jobservice.dto.*;
 import org.project.jobservice.entity.Job;
+import org.project.jobservice.domain.JobStatus;
+import org.project.jobservice.mapper.JobMapper;
 import org.project.jobservice.repository.JobRepository;
 import org.project.jobservice.service.JobService;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,26 +23,48 @@ public class JobServiceImpl implements JobService {
 
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
+    private final CustomerClient customerClient; //
+    private final ScheduleClient scheduleClient; //
+
+    @Override
+    public List<JobDTO> getAllJobs() {
+        return jobRepository.findAll()
+                .stream()
+                .map(this::enrichJobDTO) // Use helper to add Client Name
+                .collect(Collectors.toList());
+    }
 
     @Override
     public JobDTO getJobById(UUID jobId) {
         Job job = findJobById(jobId);
-        return jobMapper.mapToJobDTO(job);
+        return enrichJobDTO(job);
+    }
+
+    @Override
+    @Transactional
+    public void scheduleJob(CreateScheduleRequest request) {
+        // 1. Verify Job Exists
+        Job job = findJobById(request.jobId());
+
+        // 2. Call Schedule Service via Feign Client
+        scheduleClient.createSchedule(request);
+
+        // 3. Update Local Status to SCHEDULED
+        job.setStatus(JobStatus.SCHEDULED);
+        jobRepository.save(job);
     }
 
     @Override
     public List<JobDTO> getJobsForEmployee(UUID employeeId) {
-        // This is a key feature for your employee's dashboard
         return jobRepository.findByAssignedEmployeeId(employeeId).stream()
-                .map(jobMapper::mapToJobDTO)
+                .map(this::enrichJobDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<JobDTO> getJobsForCustomer(UUID customerId) {
-        // This is for your admin panel's customer view
         return jobRepository.findByCustomerId(customerId).stream()
-                .map(jobMapper::mapToJobDTO)
+                .map(this::enrichJobDTO)
                 .collect(Collectors.toList());
     }
 
@@ -49,35 +73,56 @@ public class JobServiceImpl implements JobService {
     public JobDTO assignEmployeeToJob(AssignEmployeeRequest request) {
         Job job = findJobById(request.jobId());
 
-        // In a real app, you'd call user-service to verify the employeeId exists
-
         job.setAssignedEmployeeId(request.employeeId());
 
-        // When you assign an employee, the job is now "Scheduled"
-        if (job.getStatus() == org.project.jobservice.domain.JobStatus.PENDING) {
-            job.setStatus(org.project.jobservice.domain.JobStatus.SCHEDULED);
+        // Auto-update status to SCHEDULED if it was pending
+        if (job.getStatus() == JobStatus.PENDING) {
+            job.setStatus(JobStatus.SCHEDULED);
         }
 
         Job savedJob = jobRepository.save(job);
-        return jobMapper.mapToJobDTO(savedJob);
+        return enrichJobDTO(savedJob);
     }
 
     @Override
     @Transactional
-    public JobDTO updateJobStatus(UpdateJobStatusRequest request) {
-        Job job = findJobById(request.jobId());
-
-        // Add business logic here if needed (e.g., can't go from COMPLETED to PENDING)
-
-        job.setStatus(request.newStatus());
+    public JobDTO updateJobStatus(UUID jobId, JobStatus status) {
+        Job job = findJobById(jobId);
+        job.setStatus(status);
         Job savedJob = jobRepository.save(job);
-        return jobMapper.mapToJobDTO(savedJob);
+        return enrichJobDTO(savedJob);
     }
 
-    // --- Private Helper Method ---
+    // --- Helper Methods ---
 
-    private Job findJobById(UUID jobId) {
-        return jobRepository.findById(jobId)
-                .orElseThrow(() -> new EntityNotFoundException("Job not found with ID: " + jobId));
+    private Job findJobById(UUID id) {
+        return jobRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Job not found with ID: " + id));
+    }
+
+    /**
+     * Converts Entity to DTO and fetches the Customer Name from Customer Service.
+     */
+    private JobDTO enrichJobDTO(Job job) {
+        // 1. Map Entity to Record (clientName is null)
+        JobDTO dto = jobMapper.mapToJobDTO(job);
+
+        String clientName = "Unknown Customer";
+
+        // 2. Fetch Customer Name
+        try {
+            if (job.getCustomerId() != null) {
+                CustomerDTO customer = customerClient.getCustomerById(job.getCustomerId());
+                if (customer != null) {
+                    clientName = customer.firstName() + " " + customer.lastName();
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to fetch customer: " + e.getMessage());
+        }
+
+        return dto.toBuilder()
+                .clientName(clientName)
+                .build();
     }
 }

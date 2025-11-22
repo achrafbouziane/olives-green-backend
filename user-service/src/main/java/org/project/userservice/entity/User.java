@@ -42,7 +42,7 @@ public class User implements UserDetails {
     private Role role;
 
     @Column(name = "password_change_required")
-    private boolean passwordChangeRequired;
+    private Boolean passwordChangeRequired;
 
     // --- UserDetails Methods ---
 

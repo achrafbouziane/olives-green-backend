@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/schedule")
+@RequestMapping("/api/v1/schedules")
 @RequiredArgsConstructor
 public class ScheduleController {
 
@@ -37,8 +37,6 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.getScheduleByJobId(jobId));
     }
 
-    // Get a specific employee's schedule for a given day
-    // Example: GET /api/v1/schedule/employee/123e4567-e89b-12d3-a456-426614174000/day?date=2025-11-20
     @GetMapping("/employee/{employeeId}/day")
     public ResponseEntity<List<ScheduledJobDTO>> getEmployeeScheduleForDay(
             @PathVariable UUID employeeId,
@@ -46,8 +44,6 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.getScheduleForEmployeeByDay(employeeId, date));
     }
 
-    // Get the master schedule for a given day
-    // Example: GET /api/v1/schedule/day?date=2025-11-20
     @GetMapping("/day")
     public ResponseEntity<List<ScheduledJobDTO>> getMasterScheduleForDay(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {

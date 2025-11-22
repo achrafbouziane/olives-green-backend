@@ -3,6 +3,7 @@ package org.project.userservice.controller;
 import org.project.userservice.dto.AuthenticationResponse;
 import org.project.userservice.dto.ChangePasswordRequest;
 import org.project.userservice.dto.LoginRequest;
+import org.project.userservice.dto.RefreshTokenRequest;
 import org.project.userservice.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,13 @@ public class AuthenticationController {
 
         authService.changePassword(principal.getName(), request.newPassword());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthenticationResponse> refreshToken(
+            @RequestBody RefreshTokenRequest request
+    ) {
+        return ResponseEntity.ok(authService.refreshToken(request.refreshToken()));
     }
 
 

@@ -26,6 +26,7 @@ public class AdminInitializer {
                         .email("admin@olivesgreen.com")
                         .password(passwordEncoder.encode("admin123")) // Change this!
                         .role(Role.ADMIN)
+                        .passwordChangeRequired(true)
                         .build();
                 userRepository.save(admin);
                 System.out.println("--- DEFAULT ADMIN USER CREATED ---");

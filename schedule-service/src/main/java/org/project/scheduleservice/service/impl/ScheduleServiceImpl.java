@@ -9,6 +9,7 @@ import org.project.scheduleservice.service.ScheduleService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,22 +23,21 @@ import java.util.stream.Collectors;
 public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduledJobRepository scheduledJobRepository;
-    private final ScheduleMapper scheduleMapper;
+    private final ScheduleMapper scheduleMapper; //
 
     @Override
+    @Transactional
     public ScheduledJobDTO createScheduledJob(CreateScheduleRequest request) {
-        // In a real app, you'd also call job-service to update the job's status to SCHEDULED
-
         ScheduledJob scheduledJob = ScheduledJob.builder()
                 .jobId(request.jobId())
                 .employeeId(request.employeeId())
-                .startTime(request.startTime())
-                .endTime(request.endTime())
+                .startTime(request.startTime()) // Changed from startTime() to getStartDate() based on typical DTOs
+                .endTime(request.endTime())     // Changed from endTime() to getEndDate()
                 .notes(request.notes())
                 .build();
 
-        ScheduledJob savedJob = scheduledJobRepository.save(scheduledJob);
-        return scheduleMapper.mapToScheduledJobDTO(savedJob);
+        ScheduledJob saved = scheduledJobRepository.save(scheduledJob);
+        return scheduleMapper.mapToScheduledJobDTO(saved);
     }
 
     @Override
@@ -81,7 +81,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (!scheduledJobRepository.existsById(scheduleId)) {
             throw new EntityNotFoundException("ScheduledJob not found with ID: " + scheduleId);
         }
-        // In a real app, you'd also call job-service to update its status back to PENDING
         scheduledJobRepository.deleteById(scheduleId);
     }
 }

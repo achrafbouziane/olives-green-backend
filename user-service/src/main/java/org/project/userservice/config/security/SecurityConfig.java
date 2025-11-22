@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -24,7 +25,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // 1. Disable CSRF (Cross-Site Request Forgery) - Not needed for stateless APIs
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
 
                 // 2. Define which API paths are public and which are secured
                 .authorizeHttpRequests(auth -> auth
@@ -33,6 +34,8 @@ public class SecurityConfig {
 
                         // Whitelist Eureka health check (if service registry is secured)
                         .requestMatchers("/actuator/health").permitAll()
+
+                        .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
 
                         // All other requests must be authenticated
                         .anyRequest().authenticated()

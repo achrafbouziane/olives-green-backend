@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +36,9 @@ public class UserServiceImpl implements UserService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .role(request.role())
+                .passwordChangeRequired(true)
                 .build();
 
-        user.setPasswordChangeRequired(true);
         var savedUser = userRepository.save(user);
         return userMapper.mapToUserDTO(savedUser);
     }
@@ -62,6 +64,19 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.deleteById(id);
     }
+
+    @Override
+    public List<UserDTO> getAllUsers(){
+        return userRepository.findAll()
+                .stream()
+                .map(user -> new UserDTO(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getRole()
+                ))
+                .collect(Collectors.toList());    }
 
 
 

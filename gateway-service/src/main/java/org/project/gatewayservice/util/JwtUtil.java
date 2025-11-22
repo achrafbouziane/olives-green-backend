@@ -8,22 +8,35 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
+import java.util.List;
+import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    // MUST MATCH the key in user-service
     @Value("${application.security.jwt.secret-key}")
     private String secretKey;
 
-    public void validateToken(String token) {
+    public void validateToken(final String token) {
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
 
-    public String extractRole(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
-        return claims.get("role", String.class); // Assuming you put "role" in the token in user-service
+    // CHANGED: Return a List<String> from the "authorities" claim
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> claims.get("authorities", List.class));
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Key getSignKey() {

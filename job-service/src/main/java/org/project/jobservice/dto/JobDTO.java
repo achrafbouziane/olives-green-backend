@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Builder
+@Builder(toBuilder = true)
 public record JobDTO(
         UUID id,
         UUID assignedEmployeeId,
@@ -13,5 +13,7 @@ public record JobDTO(
         UUID propertyId,
         UUID quoteId, // The quote this job came from
         JobStatus status,
-        LocalDate scheduledDate
+        LocalDate scheduledDate,
+        String clientName,
+        String propertyAdress
 ) {}
