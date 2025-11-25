@@ -1,9 +1,10 @@
 # Gérer les fins de ligne automatiquement
 * text=auto
 
-# Pour les fichiers shell et scripts : garder LF
+# Forcer LF pour les fichiers sensibles
 *.sh text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
 *.properties text eol=lf
 *.xml text eol=lf
+*.env text eol=lf
