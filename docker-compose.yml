@@ -151,6 +151,7 @@ services:
       SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
       JOB_DB_PASSWORD: ${JOB_DB_PASSWORD}
+      
 
   # 8. Schedule Service
   schedule-service:
@@ -246,6 +247,17 @@ services:
       SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
       CONTENT_DB_PASSWORD: ${CONTENT_DB_PASSWORD}
+
+  storage-service:
+    build: ./storage-service
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./uploads_data:/app/uploads # Persist files on host machine
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
 
 volumes:
   postgres_data:

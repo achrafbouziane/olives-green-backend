@@ -27,7 +27,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public CustomerDTO createCustomer(CreateCustomerRequest request) {
-        // AUTOMATIC: Convert Request -> Entity using Mapper
         Customer customer = customerMapper.toEntity(request);
 
         Customer savedCustomer = customerRepository.save(customer);
@@ -90,4 +89,29 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseThrow(() -> new EntityNotFoundException("Customer not found with email: " + email));
         return customerMapper.mapToCustomerDTO(customer);
     }
+
+    @Override
+    public CustomerDTO updateCustomer(UUID id, UpdateCustomerRequest req) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        if (req.firstName() != null && !req.firstName().isBlank()) {
+            customer.setFirstName(req.firstName());
+        }
+
+        if (req.lastName() != null && !req.lastName().isBlank()) {
+            customer.setLastName(req.lastName());
+        }
+
+        if (req.email() != null && !req.email().isBlank()) {
+            customer.setEmail(req.email());
+        }
+
+        if (req.phoneNumber() != null && !req.phoneNumber().isBlank()) {
+            customer.setPhoneNumber(req.phoneNumber());
+        }
+
+        return customerMapper.mapToCustomerDTO(customerRepository.save(customer));
+    }
+
 }

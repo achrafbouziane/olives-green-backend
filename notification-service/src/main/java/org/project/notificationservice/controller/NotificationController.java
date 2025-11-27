@@ -23,7 +23,7 @@ public class NotificationController {
      */
     @PostMapping
     public ResponseEntity<Void> sendNotification(@RequestBody NotificationRequest request) {
-        // We run this async so the calling service gets an instant response
+        // We run this async so the calling service gets an LocalDateTime response
         // In a real app, you'd put this message on a RabbitMQ queue
         new Thread(() -> {
             notificationService.processNotification(request);

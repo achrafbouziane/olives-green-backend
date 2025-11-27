@@ -8,7 +8,7 @@ import java.util.UUID;
 public record ScheduledJobDTO(
         UUID id,
         UUID jobId,
-        UUID employeeId,
+        UUID assignedEmployeeId,
         LocalDateTime startTime,
         LocalDateTime endTime,
         String notes

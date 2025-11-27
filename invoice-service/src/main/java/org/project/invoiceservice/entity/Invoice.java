@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import org.project.invoiceservice.domain.InvoiceStatus;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -43,12 +43,17 @@ public class Invoice {
     private BigDecimal totalAmount;
 
     @Column(nullable = false)
-    private Instant issuedDate;
+    private LocalDateTime issuedDate;
 
     @Column(nullable = false)
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
 
-    private Instant paidDate;
+    private LocalDateTime paidDate;
+
+    private String customerName;
+    private String customerEmail;
+    private String customerPhone;
+    private String serviceAddress; // The property address snapshot
 
     // An Invoice has many LineItems
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

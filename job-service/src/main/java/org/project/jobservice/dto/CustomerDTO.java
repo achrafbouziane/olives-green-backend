@@ -1,13 +1,13 @@
 package org.project.jobservice.dto;
 
-import lombok.Builder;
+import java.util.List;
 import java.util.UUID;
 
-@Builder
 public record CustomerDTO(
         UUID id,
         String firstName,
         String lastName,
         String email,
-        String phoneNumber
+        String phoneNumber,
+        List<PropertyDTO> properties // ✅ Ensure this list exists
 ) {}

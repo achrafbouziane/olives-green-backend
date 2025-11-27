@@ -10,5 +10,5 @@ spring:
 
   # This tells the app how to find the Config Server
   config:
-    import: "configserver:http://config-server:8888"
-#    import: "configserver:http://localhost:8888"
+    #import: "configserver:http://config-server:8888"
+    import: "configserver:http://localhost:8888"

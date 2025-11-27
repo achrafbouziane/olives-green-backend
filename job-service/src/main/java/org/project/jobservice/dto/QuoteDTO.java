@@ -3,7 +3,7 @@ package org.project.jobservice.dto;
 import org.project.jobservice.domain.QuoteStatus;
 import lombok.Builder;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,9 +20,13 @@ public record QuoteDTO(
         BigDecimal depositAmount,
         String magicLinkToken,
         // -------------------------------
-        String requestDetails,
+        String customerName,
+        String customerEmail,
+        String customerPhone,
+        String serviceAddress,
 
-        Instant createdAt,
+        LocalDateTime createdAt,
         List<LineItemDTO> lineItems,
-        List<String> mockupImageUrls
+        List<String> mockupImageUrls,
+        BigDecimal discount
 ) {}

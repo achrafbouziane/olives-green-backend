@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="config-server" />
+        <module name="storage-service" />
         <module name="eureka-server" />
         <module name="gateway-service" />
         <module name="notification-service" />
@@ -62,6 +63,7 @@
       <module name="olivesgreen" options="" />
       <module name="profile-service" options="-parameters -parameters" />
       <module name="schedule-service" options="-parameters" />
+      <module name="storage-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>

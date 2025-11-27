@@ -23,6 +23,12 @@ public class InvoiceController {
      * This endpoint would be called by your job-service
      * when a job is marked 'COMPLETED'.
      */
+
+    @GetMapping
+    public ResponseEntity<List<InvoiceDTO>> getAllInvoices() {
+        return ResponseEntity.ok(invoiceService.getAllInvoices());
+    }
+
     @PostMapping
     public ResponseEntity<InvoiceDTO> createInvoice(@RequestBody CreateInvoiceRequest request) {
         InvoiceDTO invoice = invoiceService.createInvoice(request);

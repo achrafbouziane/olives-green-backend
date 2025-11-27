@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,14 +39,14 @@ public class ScheduleController {
 
     @GetMapping("/employee/{employeeId}/day")
     public ResponseEntity<List<ScheduledJobDTO>> getEmployeeScheduleForDay(
-            @PathVariable UUID employeeId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(scheduleService.getScheduleForEmployeeByDay(employeeId, date));
+            @PathVariable UUID assignedEmployeeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime date) {
+        return ResponseEntity.ok(scheduleService.getScheduleForEmployeeByDay(assignedEmployeeId, date));
     }
 
     @GetMapping("/day")
     public ResponseEntity<List<ScheduledJobDTO>> getMasterScheduleForDay(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime date) {
         return ResponseEntity.ok(scheduleService.getMasterScheduleByDay(date));
     }
 }

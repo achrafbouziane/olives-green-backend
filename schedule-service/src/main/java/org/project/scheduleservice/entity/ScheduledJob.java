@@ -22,18 +22,18 @@ public class ScheduledJob {
     private UUID id;
 
     // This is the ID from your job-service
-    @Column(nullable = false, unique = true) // A job can only be scheduled once
+    @Column(name = "job_id", nullable = false, unique = true)
     private UUID jobId;
 
     // This is the ID from your user-service
-    @Column(nullable = false)
-    private UUID employeeId;
+    @Column(name = "assigned_employee_id", nullable = false)
+    private UUID assignedEmployeeId;
 
-    // These are the "When" details
-    @Column(nullable = false)
+
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    @Column(nullable = false)
+    @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
     @Column(columnDefinition = "TEXT")

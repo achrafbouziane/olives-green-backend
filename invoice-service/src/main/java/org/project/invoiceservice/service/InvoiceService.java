@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface InvoiceService {
 
+    List<InvoiceDTO> getAllInvoices();
+
     /**
      * Creates a new invoice from a completed job.
      */

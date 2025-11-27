@@ -11,4 +11,6 @@ public interface CustomerService {
     CustomerDTO getCustomerById(UUID id);
     List<PropertyDTO> getPropertiesForCustomer(UUID customerId);
     CustomerDTO getCustomerByEmail(String email);
+    CustomerDTO updateCustomer(UUID id, UpdateCustomerRequest request);
+
 }

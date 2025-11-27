@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .email(request.email())
+                .phoneNumber(request.phoneNumber())
                 .password(passwordEncoder.encode(request.password()))
                 .role(request.role())
                 .passwordChangeRequired(true)
@@ -52,6 +53,7 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setEmail(request.email());
+        user.setPhoneNumber(request.phoneNumber());
         user.setRole(request.role());
 
         return userMapper.mapToUserDTO(userRepository.save(user));
@@ -74,6 +76,7 @@ public class UserServiceImpl implements UserService {
                         user.getFirstName(),
                         user.getLastName(),
                         user.getEmail(),
+                        user.getPhoneNumber(),
                         user.getRole()
                 ))
                 .collect(Collectors.toList());    }

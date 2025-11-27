@@ -9,7 +9,7 @@ import org.project.jobservice.domain.QuoteStatus;
 import jakarta.persistence.Column;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -43,18 +43,21 @@ public class Quote {
 
     @Column(nullable = false)
     private BigDecimal totalAmount;
+    private BigDecimal discount;
 
     private String magicLinkToken; // Unique token for email link
     private BigDecimal depositAmount; // The 50% required
-    private Instant estimateSentAt;
+    private LocalDateTime estimateSentAt;
 
-    @Column(columnDefinition = "TEXT") // Allow long text for coords/address
-    private String requestDetails;
+    private String customerName;
+    private String customerEmail;
+    private String customerPhone;
+    private String serviceAddress; // The property address snapshot
 
 
-    private Instant createdAt;
-    private Instant sentAt;
-    private Instant approvedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime sentAt;
+    private LocalDateTime approvedAt;
 
     // A Quote has many LineItems
     @OneToMany(mappedBy = "quote", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

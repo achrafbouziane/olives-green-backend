@@ -4,5 +4,5 @@ import java.util.UUID;
 
 public record AssignEmployeeRequest(
         UUID jobId,
-        UUID employeeId
+        UUID assignedEmployeeId
 ) {}

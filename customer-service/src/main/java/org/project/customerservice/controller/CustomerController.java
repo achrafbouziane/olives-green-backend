@@ -34,6 +34,16 @@ public class CustomerController {
     public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable UUID id) {
         return ResponseEntity.ok(customerService.getCustomerById(id));
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerDTO> updateCustomer(
+            @PathVariable UUID id,
+            @RequestBody UpdateCustomerRequest request
+    ) {
+        CustomerDTO updated = customerService.updateCustomer(id, request);
+        return ResponseEntity.ok(updated);
+    }
+
+
 
     // --- Property Endpoints (Scoped to a customer) ---
 
