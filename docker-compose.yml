@@ -1,0 +1,263 @@
+services:
+  # 1. Configuration Server
+  config-server:
+    build:
+      context: . # Build from the root 'olivesgreen' folder
+      dockerfile: config-server/Dockerfile
+      args:
+        SERVICE_NAME: config-server # Pass the folder name as an arg
+    ports:
+      - "8888:8888"
+    environment:
+      GIT_USERNAME: ${GIT_USERNAME}
+      GIT_PASSWORD: ${GIT_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 30
+      start_period: 30s # Give it 30s to clone the repo and start
+
+  # 2. Eureka Server
+  eureka-server:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+      args:
+        SERVICE_NAME: eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  # 3. PostgreSQL Database
+  postgres-db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Reads from .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # 4. API Gateway
+  gateway-service:
+    build:
+      context: .
+      dockerfile: gateway-service/Dockerfile
+      args:
+        SERVICE_NAME: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+
+
+  # 5. User Service
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+      args:
+        SERVICE_NAME: user-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+
+  # 6. Customer Service
+  customer-service:
+    build:
+      context: .
+      dockerfile: customer-service/Dockerfile
+      args:
+        SERVICE_NAME: customer-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      CUSTOMER_DB_PASSWORD: ${CUSTOMER_DB_PASSWORD}
+
+  # 7. Job Service
+  job-service:
+    build:
+      context: .
+      dockerfile: job-service/Dockerfile
+      args:
+        SERVICE_NAME: job-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      JOB_DB_PASSWORD: ${JOB_DB_PASSWORD}
+      
+
+  # 8. Schedule Service
+  schedule-service:
+    build:
+      context: .
+      dockerfile: schedule-service/Dockerfile
+      args:
+        SERVICE_NAME: schedule-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      SCHEDULE_DB_PASSWORD: ${SCHEDULE_DB_PASSWORD}
+
+  # 9. Invoice Service
+  invoice-service:
+    build:
+      context: .
+      dockerfile: invoice-service/Dockerfile
+      args:
+        SERVICE_NAME: invoice-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      INVOICE_DB_PASSWORD: ${INVOICE_DB_PASSWORD}
+
+  # 10. Notification Service
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+      args:
+        SERVICE_NAME: notification-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      NOTIFICATION_DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
+
+  # 11. Content Service
+  content-service:
+    build:
+      context: .
+      dockerfile: content-service/Dockerfile
+      args:
+        SERVICE_NAME: content-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      postgres-db:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-server:8888"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: false
+      SPRING_CLOUD_CONFIG_FAILFAST: false
+      SPRING_CLOUD_BOOTSTRAP_ENABLED: false # <-- ADD THIS
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+      CONTENT_DB_PASSWORD: ${CONTENT_DB_PASSWORD}
+
+  storage-service:
+    build: ./storage-service
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./uploads_data:/app/uploads # Persist files on host machine
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+
+volumes:
+  postgres_data:
